@@ -1,7 +1,7 @@
 ﻿from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
-from app.models.models import ProductCategory, OrderStatus
+from ..models.models import ProductCategory, OrderStatus
 
 class ProductBase(BaseModel):
     name: str

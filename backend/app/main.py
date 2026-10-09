@@ -3,15 +3,15 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from app.database import engine, Base
-from app.database import SessionLocal
-from app.models import models
-from app.routes import products, orders
+from .database import engine, Base
+from .database import SessionLocal
+from .models import models
+from .routes import products, orders
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Coffee Shop API", version="1.0.0")
-INDEX_FILE = Path(__file__).resolve().parents[2] / "index.html"
+INDEX_FILE = Path(__file__).resolve().parents[2] / "frontend" / "index.html"
 
 app.add_middleware(
     CORSMiddleware,

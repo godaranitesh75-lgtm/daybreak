@@ -2,6 +2,16 @@
 
 A small coffee shop point-of-sale and management app built with FastAPI, SQLAlchemy, SQLite/PostgreSQL, and a responsive HTML dashboard.
 
+## Project structure
+
+```text
+frontend/           Coffee shop dashboard
+backend/            FastAPI application and database models
+	app/
+	requirements.txt
+pyproject.toml       Vercel FastAPI entrypoint
+```
+
 ## Features
 
 - Menu browsing with category filters and search
