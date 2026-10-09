@@ -1,0 +1,583 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f7f7f1">
+    <title>Daybreak Coffee | Shop Manager</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --ink: #202a25;
+            --muted: #768078;
+            --line: #e5e9e2;
+            --paper: #f7f8f3;
+            --white: #fff;
+            --green: #315d48;
+            --green-soft: #e8f0e8;
+            --lime: #d9e98c;
+            --coral: #d86e52;
+            --yellow: #f2d982;
+            --shadow: 0 14px 40px rgba(34, 48, 39, .08);
+            font-family: "DM Sans", sans-serif;
+            font-synthesis: none;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--paper); color: var(--ink); min-width: 320px; }
+        button, input, select { font: inherit; }
+        button { cursor: pointer; }
+        .layout { display: grid; grid-template-columns: 232px minmax(0, 1fr); min-height: 100vh; }
+        .sidebar { background: #213b30; color: #f7f8f3; display: flex; flex-direction: column; padding: 26px 16px 20px; }
+        .brand { display: flex; align-items: center; gap: 11px; padding: 0 12px 35px; }
+        .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 13px 13px 13px 4px; color: #213b30; background: var(--lime); font-size: 21px; }
+        .brand-name { font: 600 21px "Fraunces", Georgia, serif; letter-spacing: 0; }
+        .brand-sub { color: #aab8ad; font-size: 10px; letter-spacing: 1.3px; text-transform: uppercase; margin-top: 2px; }
+        .nav-label { color: #92a69a; padding: 0 13px 10px; font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; }
+        .nav-list { display: grid; gap: 5px; }
+        .nav-button { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 45px; padding: 0 13px; border: 0; border-radius: 9px; background: transparent; color: #d2ded5; text-align: left; font-size: 13px; font-weight: 600; }
+        .nav-button:hover { background: rgba(255,255,255,.08); }
+        .nav-button.active { color: #20372d; background: var(--lime); }
+        .nav-icon { width: 20px; text-align: center; font-size: 16px; }
+        .sidebar-spacer { flex: 1; }
+        .shop-status { margin: 16px 5px 0; padding: 14px 12px; border: 1px solid rgba(255,255,255,.14); border-radius: 10px; }
+        .status-line { display: flex; align-items: center; gap: 7px; font-size: 11px; color: #dbe5dc; }
+        .status-dot { width: 7px; height: 7px; background: #b3d765; border-radius: 50%; }
+        .shop-caption { color: #98ac9e; font-size: 10px; margin: 8px 0 0 14px; }
+        .main { min-width: 0; padding: 0 32px 36px; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; height: 78px; border-bottom: 1px solid var(--line); }
+        .crumb { color: var(--muted); font-size: 12px; }
+        .crumb strong { color: var(--ink); font-weight: 600; }
+        .topbar-actions { display: flex; align-items: center; gap: 16px; }
+        .today-date { color: var(--muted); font-size: 12px; }
+        .avatar { display: grid; place-items: center; width: 35px; height: 35px; border-radius: 50%; background: #f1d2c8; color: #6f3d31; font-size: 11px; font-weight: 700; }
+        .page { display: none; padding-top: 26px; animation: appear .24s ease both; }
+        .page.active { display: block; }
+        @keyframes appear { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .page-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; margin-bottom: 21px; }
+        .eyebrow { color: var(--green); font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 7px; }
+        h1, h2, h3, p { margin-top: 0; }
+        h1 { font: 500 30px "Fraunces", Georgia, serif; letter-spacing: 0; margin: 0; }
+        .page-description { color: var(--muted); font-size: 12px; margin: 7px 0 0; }
+        .button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 39px; padding: 0 14px; border: 1px solid var(--line); border-radius: 7px; background: var(--white); color: var(--ink); font-size: 12px; font-weight: 700; transition: transform .15s, background .15s; }
+        .button:hover { transform: translateY(-1px); background: #f1f4ed; }
+        .button-primary { background: var(--green); color: white; border-color: var(--green); }
+        .button-primary:hover { background: #254d3a; }
+        .button-text { border: 0; background: transparent; color: var(--green); padding: 0; min-height: 30px; }
+        .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 13px; margin-bottom: 22px; }
+        .stat { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; background: var(--white); border: 1px solid var(--line); border-radius: 9px; min-height: 84px; }
+        .stat-label { color: var(--muted); font-size: 11px; }
+        .stat-value { font: 600 22px "Fraunces", Georgia, serif; margin-top: 5px; }
+        .stat-icon { display: grid; place-items: center; width: 34px; height: 34px; background: var(--green-soft); border-radius: 10px; color: var(--green); font-size: 15px; }
+        .stat:nth-child(2) .stat-icon { background: #fff0df; color: #a76326; }
+        .stat:nth-child(3) .stat-icon { background: #fbe8e0; color: var(--coral); }
+        .stat:nth-child(4) .stat-icon { background: #f1f2d8; color: #727c2c; }
+        .counter-grid { display: grid; grid-template-columns: minmax(0, 1fr) 326px; align-items: start; gap: 20px; }
+        .menu-area { min-width: 0; }
+        .menu-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin: 0 0 14px; }
+        .menu-toolbar h2, .section-title { font: 600 18px "Fraunces", Georgia, serif; margin: 0; }
+        .search-wrap { position: relative; width: min(100%, 245px); }
+        .search-wrap span { position: absolute; left: 12px; top: 10px; font-size: 13px; color: #929b93; }
+        .search { width: 100%; height: 36px; padding: 0 10px 0 33px; border: 1px solid var(--line); border-radius: 7px; background: white; outline: none; font-size: 11px; }
+        .search:focus, input:focus, select:focus { border-color: #7a9a81; box-shadow: 0 0 0 3px rgba(49,93,72,.1); outline: none; }
+        .categories { display: flex; gap: 7px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: thin; }
+        .category-chip { border: 1px solid var(--line); border-radius: 20px; padding: 7px 13px; color: #657168; background: white; white-space: nowrap; font-size: 10px; font-weight: 700; }
+        .category-chip.active { color: white; background: var(--green); border-color: var(--green); }
+        .product-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+        .product-card { min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 9px; background: white; transition: transform .16s, box-shadow .16s; }
+        .product-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+        .product-card:focus-within { outline: 2px solid var(--green); }
+        .product-image { display: block; width: 100%; height: 116px; object-fit: cover; background: #e8eee3; }
+        .product-info { padding: 11px 12px 12px; }
+        .product-name-row { display: flex; justify-content: space-between; gap: 7px; align-items: start; }
+        .product-name { font-size: 12px; font-weight: 700; line-height: 1.35; }
+        .product-price { color: var(--green); white-space: nowrap; font-size: 12px; font-weight: 700; }
+        .product-desc { min-height: 28px; color: var(--muted); font-size: 10px; line-height: 1.4; margin: 6px 0 10px; }
+        .product-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 5px; }
+        .stock-note { color: var(--muted); font-size: 9px; }
+        .stock-note.low { color: #bd5e45; }
+        .add-button { height: 28px; width: 30px; border: 0; border-radius: 6px; color: white; background: var(--green); font-size: 18px; line-height: 1; }
+        .add-button:disabled { background: #aeb7b0; cursor: not-allowed; }
+        .order-panel { position: sticky; top: 14px; background: white; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+        .order-head { display: flex; justify-content: space-between; align-items: center; padding: 17px 17px 13px; border-bottom: 1px solid var(--line); }
+        .order-head h2 { font: 600 18px "Fraunces", Georgia, serif; margin: 0; }
+        .order-count { padding: 4px 8px; border-radius: 12px; background: var(--green-soft); color: var(--green); font-size: 10px; font-weight: 700; }
+        .customer-field { padding: 13px 16px 4px; }
+        .field-label { display: block; margin-bottom: 6px; color: #5f6d63; font-size: 10px; font-weight: 700; }
+        .field-input, .field-select { width: 100%; height: 36px; padding: 0 10px; border: 1px solid var(--line); border-radius: 6px; color: var(--ink); background: white; font-size: 11px; }
+        .cart-items { display: grid; gap: 0; max-height: 265px; overflow: auto; padding: 3px 16px; }
+        .cart-empty { display: grid; place-items: center; min-height: 130px; color: var(--muted); font-size: 11px; text-align: center; }
+        .cart-empty-mark { display: grid; place-items: center; width: 42px; height: 42px; margin-bottom: 8px; border-radius: 50%; background: #f1f4ed; color: var(--green); font-size: 19px; }
+        .cart-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 5px; padding: 11px 0; border-bottom: 1px solid #f0f2ee; }
+        .cart-item-name { font-size: 11px; font-weight: 700; }
+        .cart-item-price { margin-top: 4px; color: var(--muted); font-size: 10px; }
+        .quantity-control { display: flex; align-items: center; gap: 7px; }
+        .quantity-control button { display: grid; place-items: center; width: 23px; height: 23px; border: 1px solid var(--line); border-radius: 5px; background: white; color: var(--ink); }
+        .quantity-control span { min-width: 12px; text-align: center; font-size: 11px; font-weight: 700; }
+        .order-total { padding: 13px 16px 16px; }
+        .total-line { display: flex; justify-content: space-between; margin-bottom: 7px; color: var(--muted); font-size: 11px; }
+        .total-line.grand { color: var(--ink); font-size: 14px; font-weight: 700; margin: 13px 0 14px; }
+        .checkout-button { width: 100%; min-height: 42px; }
+        .queue-list { display: grid; gap: 10px; }
+        .order-row { display: grid; grid-template-columns: minmax(180px, 1.1fr) minmax(180px, 1fr) 110px 130px; align-items: center; gap: 16px; padding: 15px 17px; background: white; border: 1px solid var(--line); border-radius: 8px; }
+        .order-id { font-size: 12px; font-weight: 700; }
+        .order-meta { color: var(--muted); font-size: 10px; margin-top: 4px; }
+        .order-items-preview { color: #56645a; font-size: 10px; line-height: 1.5; }
+        .order-total-cell { font-size: 12px; font-weight: 700; }
+        .order-status { width: 100%; height: 32px; padding: 0 8px; border: 1px solid var(--line); border-radius: 6px; background: white; color: var(--ink); font-size: 10px; text-transform: capitalize; }
+        .inventory-wrap { overflow-x: auto; background: white; border: 1px solid var(--line); border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 12px 15px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; }
+        td { padding: 13px 15px; border-bottom: 1px solid #eff1ed; font-size: 11px; }
+        tr:last-child td { border-bottom: 0; }
+        .inventory-name { font-weight: 700; }
+        .inventory-category { color: var(--muted); text-transform: capitalize; }
+        .stock-pill { display: inline-flex; padding: 5px 8px; border-radius: 12px; background: var(--green-soft); color: var(--green); font-size: 10px; font-weight: 700; }
+        .stock-pill.low { background: #fbe8e0; color: #a54d38; }
+        .row-actions { display: flex; justify-content: flex-end; gap: 6px; }
+        .small-button { min-height: 29px; padding: 0 9px; font-size: 10px; }
+        .empty-state { padding: 42px 18px; color: var(--muted); text-align: center; font-size: 12px; }
+        .toast { position: fixed; right: 22px; bottom: 22px; z-index: 10; max-width: min(360px, calc(100vw - 36px)); padding: 13px 17px; border-radius: 8px; background: #203b30; color: white; box-shadow: var(--shadow); font-size: 12px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: .2s ease; }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .modal-backdrop { position: fixed; inset: 0; z-index: 20; display: none; place-items: center; padding: 18px; background: rgba(23,37,29,.46); }
+        .modal-backdrop.open { display: grid; }
+        .modal { width: min(100%, 440px); padding: 22px; border-radius: 10px; background: white; box-shadow: 0 24px 70px rgba(18,32,23,.22); }
+        .modal-head { display: flex; justify-content: space-between; align-items: start; margin-bottom: 17px; }
+        .modal-head h2 { font: 600 21px "Fraunces", Georgia, serif; margin: 0; }
+        .modal-close { border: 0; background: transparent; color: var(--muted); font-size: 21px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-field.full { grid-column: 1 / -1; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+        @media (max-width: 1100px) {
+            .layout { grid-template-columns: 190px minmax(0, 1fr); }
+            .main { padding-inline: 22px; }
+            .counter-grid { grid-template-columns: minmax(0, 1fr) 300px; gap: 14px; }
+            .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .stats { gap: 9px; }
+            .stat { padding-inline: 12px; }
+            .order-row { grid-template-columns: 1fr 1fr 85px 125px; gap: 10px; }
+        }
+        @media (max-width: 760px) {
+            .layout { display: block; padding-bottom: 66px; }
+            .sidebar { position: fixed; z-index: 5; inset: auto 0 0; display: block; height: 62px; padding: 5px 7px; }
+            .brand, .nav-label, .sidebar-spacer, .shop-status { display: none; }
+            .nav-list { height: 100%; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+            .nav-button { justify-content: center; flex-direction: column; gap: 3px; min-height: 0; padding: 5px; font-size: 9px; }
+            .nav-icon { width: auto; font-size: 16px; }
+            .main { padding: 0 16px 26px; }
+            .topbar { height: 60px; }
+            .page { padding-top: 20px; }
+            .page-heading { align-items: flex-start; }
+            h1 { font-size: 26px; }
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .stat { min-height: 74px; }
+            .counter-grid { grid-template-columns: 1fr; }
+            .order-panel { position: static; order: -1; }
+            .cart-items { max-height: 180px; }
+            .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .product-image { height: 105px; }
+            .order-row { grid-template-columns: 1fr auto; gap: 9px 12px; }
+            .order-items-preview { grid-column: 1 / -1; grid-row: 2; }
+            .order-total-cell { grid-column: 1; grid-row: 3; }
+            .order-status { grid-column: 2; grid-row: 3; width: 128px; }
+            .today-date { display: none; }
+        }
+        @media (max-width: 400px) {
+            .main { padding-inline: 11px; }
+            .product-grid { gap: 8px; }
+            .product-info { padding: 9px; }
+            .product-desc { font-size: 9px; }
+            .menu-toolbar { align-items: flex-start; flex-direction: column; }
+            .search-wrap { width: 100%; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-field.full { grid-column: auto; }
+        }
+        :root {
+            --ink: #263238;
+            --muted: #65747a;
+            --line: #ccd6da;
+            --paper: #f2f4f6;
+            --white: #fff;
+            --green: #286b8c;
+            --green-soft: #e6f0f4;
+            --lime: #dcecf2;
+            --coral: #b85c48;
+            --shadow: none;
+            font-family: Arial, sans-serif;
+        }
+        .layout { display: block; min-height: 100vh; }
+        .sidebar { position: static; display: flex; flex-direction: row; align-items: center; gap: 20px; padding: 12px 22px; background: #28627f; color: white; border-bottom: 3px solid #d8eaf0; }
+        .brand { padding: 0; }
+        .brand-mark { border-radius: 5px; background: white; color: #28627f; }
+        .brand-name { font: bold 20px Arial, sans-serif; }
+        .brand-sub { color: #d1e1e8; letter-spacing: 1px; }
+        .nav-label, .sidebar-spacer { display: none; }
+        .nav-list { display: flex; gap: 6px; }
+        .nav-button { min-height: 36px; border-radius: 4px; color: white; font-weight: 600; }
+        .nav-button:hover { background: rgba(255,255,255,.12); }
+        .nav-button.active { background: white; color: #245b76; }
+        .shop-status { margin: 0 0 0 auto; padding: 8px 10px; border-radius: 4px; }
+        .main { width: min(100%, 1380px); margin: 0 auto; padding: 0 24px 32px; }
+        .topbar { height: 58px; }
+        .page { animation: none; }
+        h1 { font: bold 27px Arial, sans-serif; }
+        .menu-toolbar h2, .section-title, .order-head h2 { font: bold 18px Arial, sans-serif; }
+        .stat-value { font: bold 21px Arial, sans-serif; }
+        .button, .category-chip, .field-input, .field-select, .search, .order-status { border-radius: 4px; }
+        .button { transition: none; }
+        .button:hover, .product-card:hover { transform: none; box-shadow: none; }
+        .stat, .product-card, .order-panel, .inventory-wrap, .order-row { border-radius: 4px; box-shadow: none; }
+        .product-card { transition: none; }
+        .product-image { height: 105px; }
+        .order-panel { position: static; }
+        .modal { border-radius: 5px; box-shadow: 0 8px 22px rgba(0,0,0,.16); }
+        .toast { box-shadow: none; }
+        @media (max-width: 760px) {
+            .layout { display: block; padding-bottom: 0; }
+            .sidebar { position: static; inset: auto; display: flex; height: auto; flex-wrap: wrap; gap: 10px; padding: 10px 12px; }
+            .brand { display: flex; }
+            .nav-list { height: auto; flex: 1 1 100%; justify-content: flex-start; }
+            .nav-button { flex-direction: row; min-height: 38px; padding: 5px 10px; font-size: 11px; }
+            .shop-status { display: none; }
+            .main { padding: 0 16px 24px; }
+            .order-panel { position: static; }
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark" aria-hidden="true">D</div>
+                <div><div class="brand-name">daybreak</div><div class="brand-sub">coffee house</div></div>
+            </div>
+            <div class="nav-label">Workspace</div>
+            <nav class="nav-list" aria-label="Main navigation">
+                <button class="nav-button active" data-page="counter"><span class="nav-icon">＋</span><span>Counter</span></button>
+                <button class="nav-button" data-page="orders"><span class="nav-icon">▤</span><span>Orders</span></button>
+                <button class="nav-button" data-page="inventory"><span class="nav-icon">▦</span><span>Inventory</span></button>
+            </nav>
+            <div class="sidebar-spacer"></div>
+            <div class="shop-status"><div class="status-line"><span class="status-dot"></span> Shop is open</div><div class="shop-caption">Daybreak · Downtown</div></div>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <div class="crumb">Daybreak Coffee <span aria-hidden="true"> / </span> <strong id="crumb-label">Counter</strong></div>
+                <div class="topbar-actions"><span id="today-date" class="today-date"></span><div class="avatar" aria-label="Staff profile">MC</div></div>
+            </header>
+
+            <section class="page active" id="page-counter">
+                <div class="page-heading">
+                    <div><div class="eyebrow">Friday service · Downtown</div><h1>Good coffee, good day.</h1><p class="page-description">Build an order and send it straight to the bar.</p></div>
+                </div>
+                <div class="stats">
+                      <div class="stat"><div><div class="stat-label">Sales today</div><div class="stat-value" id="stat-sales">₹0.00</div></div><div class="stat-icon">₹</div></div>
+                    <div class="stat"><div><div class="stat-label">Orders today</div><div class="stat-value" id="stat-orders">0</div></div><div class="stat-icon">▤</div></div>
+                    <div class="stat"><div><div class="stat-label">In the queue</div><div class="stat-value" id="stat-queue">0</div></div><div class="stat-icon">◷</div></div>
+                    <div class="stat"><div><div class="stat-label">Menu items</div><div class="stat-value" id="stat-menu">0</div></div><div class="stat-icon">✳</div></div>
+                </div>
+
+                <div class="counter-grid">
+                    <section class="menu-area" aria-label="Menu">
+                        <div class="menu-toolbar"><h2>Today’s menu</h2><label class="search-wrap"><span aria-hidden="true">⌕</span><input class="search" id="menu-search" type="search" placeholder="Find a drink or bite" aria-label="Search menu"></label></div>
+                        <div class="categories" id="categories" aria-label="Filter by category"></div>
+                        <div class="product-grid" id="product-grid"></div>
+                    </section>
+
+                    <aside class="order-panel" aria-label="Current order">
+                        <div class="order-head"><h2>New order</h2><span class="order-count" id="cart-count">0 items</span></div>
+                        <div class="customer-field"><label class="field-label" for="customer-name">Customer name</label><input class="field-input" id="customer-name" placeholder="Walk-in customer" maxlength="100"></div>
+                        <div class="cart-items" id="cart-items"></div>
+                        <div class="order-total"><div class="total-line"><span>Subtotal</span><span id="cart-subtotal">$0.00</span></div><div class="total-line"><span>Tax</span><span id="cart-tax">$0.00</span></div><div class="total-line grand"><span>Total</span><span id="cart-total">$0.00</span></div><button id="checkout-button" class="button button-primary checkout-button" disabled>Send to bar <span aria-hidden="true">→</span></button></div>
+                    </aside>
+                </div>
+            </section>
+
+            <section class="page" id="page-orders">
+                <div class="page-heading"><div><div class="eyebrow">Service overview</div><h1>Order queue</h1><p class="page-description">Track every ticket from counter to pickup.</p></div><button class="button" id="refresh-orders">↻ &nbsp; Refresh</button></div>
+                <div class="stats">
+                    <div class="stat"><div><div class="stat-label">All orders</div><div class="stat-value" id="orders-total">0</div></div><div class="stat-icon">▤</div></div>
+                    <div class="stat"><div><div class="stat-label">Pending</div><div class="stat-value" id="orders-pending">0</div></div><div class="stat-icon">◷</div></div>
+                    <div class="stat"><div><div class="stat-label">Preparing</div><div class="stat-value" id="orders-preparing">0</div></div><div class="stat-icon">⌁</div></div>
+                    <div class="stat"><div><div class="stat-label">Ready for pickup</div><div class="stat-value" id="orders-ready">0</div></div><div class="stat-icon">✓</div></div>
+                </div>
+                <div class="queue-list" id="queue-list"></div>
+            </section>
+
+            <section class="page" id="page-inventory">
+                <div class="page-heading"><div><div class="eyebrow">Menu & stock</div><h1>Inventory</h1><p class="page-description">Keep the menu current and the shelves stocked.</p></div><button class="button button-primary" id="add-product">＋ &nbsp; Add menu item</button></div>
+                <div class="stats">
+                    <div class="stat"><div><div class="stat-label">Menu items</div><div class="stat-value" id="inventory-count">0</div></div><div class="stat-icon">✳</div></div>
+                    <div class="stat"><div><div class="stat-label">Units in stock</div><div class="stat-value" id="inventory-units">0</div></div><div class="stat-icon">▦</div></div>
+                    <div class="stat"><div><div class="stat-label">Running low</div><div class="stat-value" id="inventory-low">0</div></div><div class="stat-icon">!</div></div>
+                    <div class="stat"><div><div class="stat-label">Categories</div><div class="stat-value" id="inventory-categories">0</div></div><div class="stat-icon">◫</div></div>
+                </div>
+                <div class="inventory-wrap"><table><thead><tr><th>Item</th><th>Category</th><th>Price</th><th>Stock</th><th></th></tr></thead><tbody id="inventory-body"></tbody></table></div>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal-backdrop" id="product-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <form class="modal" id="product-form">
+            <div class="modal-head"><div><div class="eyebrow">Menu management</div><h2 id="modal-title">Add menu item</h2></div><button type="button" class="modal-close" id="close-modal" aria-label="Close">×</button></div>
+            <div class="form-grid">
+                <div class="form-field full"><label class="field-label" for="product-name">Item name</label><input class="field-input" id="product-name" required maxlength="100" placeholder="e.g. Honey oat latte"></div>
+                <div class="form-field full"><label class="field-label" for="product-description">Description</label><input class="field-input" id="product-description" maxlength="255" placeholder="A short description"></div>
+                <div class="form-field"><label class="field-label" for="product-price">Price</label><input class="field-input" id="product-price" type="number" min="0.01" step="0.01" required placeholder="4.50"></div>
+                <div class="form-field"><label class="field-label" for="product-stock">Starting stock</label><input class="field-input" id="product-stock" type="number" min="0" step="1" required value="10"></div>
+                <div class="form-field full"><label class="field-label" for="product-category">Category</label><select class="field-select" id="product-category"><option value="coffee">Coffee</option><option value="tea">Tea</option><option value="pastry">Pastry</option><option value="snack">Snack</option><option value="other">Other</option></select></div>
+            </div>
+            <div class="modal-actions"><button type="button" class="button" id="cancel-modal">Cancel</button><button type="submit" class="button button-primary">Save item</button></div>
+        </form>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script>
+        const API = "";
+        const money = value => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(Number(value) || 0);
+        const categories = ["all", "coffee", "tea", "pastry", "snack", "other"];
+        const images = {
+            coffee: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=700&q=80",
+            tea: "https://images.unsplash.com/photo-1515823064-d6e0c04616a7?auto=format&fit=crop&w=700&q=80",
+            pastry: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=700&q=80",
+            snack: "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=700&q=80",
+            other: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=700&q=80"
+        };
+        const state = { products: [], orders: [], cart: new Map(), category: "all", query: "" };
+        const $ = selector => document.querySelector(selector);
+
+        async function request(path, options = {}) {
+            const response = await fetch(`${API}${path}`, {
+                ...options,
+                headers: { "Content-Type": "application/json", ...(options.headers || {}) }
+            });
+            if (!response.ok) {
+                let message = `Request failed (${response.status})`;
+                try { const body = await response.json(); message = body.detail || message; } catch (_) { }
+                throw new Error(message);
+            }
+            return response.status === 204 ? null : response.json();
+        }
+
+        function toast(message) {
+            const node = $("#toast");
+            node.textContent = message;
+            node.classList.add("show");
+            clearTimeout(toast.timer);
+            toast.timer = setTimeout(() => node.classList.remove("show"), 2800);
+        }
+
+        function categoryLabel(value) { return value ? value[0].toUpperCase() + value.slice(1) : "Other"; }
+
+        function renderCategories() {
+            $("#categories").innerHTML = categories.map(category => `
+                <button class="category-chip ${state.category === category ? "active" : ""}" data-category="${category}">${category === "all" ? "Everything" : categoryLabel(category)}</button>
+            `).join("");
+            $("#categories").querySelectorAll("button").forEach(button => button.addEventListener("click", () => {
+                state.category = button.dataset.category;
+                renderCategories();
+                renderProducts();
+            }));
+        }
+
+        function renderProducts() {
+            const products = state.products.filter(product => {
+                const matchesCategory = state.category === "all" || product.category === state.category;
+                const haystack = `${product.name} ${product.description || ""}`.toLowerCase();
+                return matchesCategory && haystack.includes(state.query.toLowerCase());
+            });
+            $("#product-grid").innerHTML = products.length ? products.map(product => `
+                <article class="product-card">
+                    <img class="product-image" src="${images[product.category] || images.other}" alt="${escapeHtml(product.name)}" loading="lazy" onerror="this.src='${images.other}'">
+                    <div class="product-info">
+                        <div class="product-name-row"><span class="product-name">${escapeHtml(product.name)}</span><span class="product-price">${money(product.price)}</span></div>
+                        <p class="product-desc">${escapeHtml(product.description || categoryLabel(product.category))}</p>
+                        <div class="product-card-footer"><span class="stock-note ${product.stock <= 5 ? "low" : ""}">${product.stock <= 0 ? "Sold out" : `${product.stock} available`}</span><button class="add-button" data-add="${product.id}" aria-label="Add ${escapeHtml(product.name)}" ${product.stock <= 0 ? "disabled" : ""}>+</button></div>
+                    </div>
+                </article>`).join("") : `<div class="empty-state">No menu items match this search.</div>`;
+            $("#product-grid").querySelectorAll("[data-add]").forEach(button => button.addEventListener("click", () => addToCart(Number(button.dataset.add))));
+            $("#stat-menu").textContent = state.products.length;
+        }
+
+        function addToCart(id) {
+            const product = state.products.find(item => item.id === id);
+            if (!product) return;
+            const current = state.cart.get(id)?.quantity || 0;
+            if (current >= product.stock) return toast("There isn’t enough stock for another one.");
+            state.cart.set(id, { product, quantity: current + 1 });
+            renderCart();
+        }
+
+        function changeQuantity(id, delta) {
+            const entry = state.cart.get(id);
+            if (!entry) return;
+            const quantity = entry.quantity + delta;
+            if (quantity <= 0) state.cart.delete(id);
+            else if (quantity <= entry.product.stock) state.cart.set(id, { ...entry, quantity });
+            else return toast("That’s all that’s currently in stock.");
+            renderCart();
+        }
+
+        function renderCart() {
+            const entries = [...state.cart.entries()];
+            const quantity = entries.reduce((sum, [, item]) => sum + item.quantity, 0);
+            const subtotal = entries.reduce((sum, [, item]) => sum + item.product.price * item.quantity, 0);
+            const tax = subtotal * 0.08;
+            $("#cart-count").textContent = `${quantity} ${quantity === 1 ? "item" : "items"}`;
+            $("#cart-subtotal").textContent = money(subtotal);
+            $("#cart-tax").textContent = money(tax);
+            $("#cart-total").textContent = money(subtotal + tax);
+            $("#checkout-button").disabled = quantity === 0;
+            $("#cart-items").innerHTML = entries.length ? entries.map(([id, item]) => `
+                <div class="cart-row"><div><div class="cart-item-name">${escapeHtml(item.product.name)}</div><div class="cart-item-price">${money(item.product.price * item.quantity)}</div></div>
+                    <div class="quantity-control"><button data-quantity="${id}" data-delta="-1" aria-label="Remove one">−</button><span>${item.quantity}</span><button data-quantity="${id}" data-delta="1" aria-label="Add one">+</button></div>
+                </div>`).join("") : `<div class="cart-empty"><div><div class="cart-empty-mark">＋</div>Your next favorite starts here.</div></div>`;
+            $("#cart-items").querySelectorAll("[data-quantity]").forEach(button => button.addEventListener("click", () => changeQuantity(Number(button.dataset.quantity), Number(button.dataset.delta))));
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? "").replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character]));
+        }
+
+        function isToday(dateValue) {
+            const date = new Date(dateValue);
+            const now = new Date();
+            return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate();
+        }
+
+        function updateMetrics() {
+            const todaysOrders = state.orders.filter(order => isToday(order.order_date) && order.status !== "cancelled");
+            const sales = todaysOrders.filter(order => order.status === "completed").reduce((sum, order) => sum + order.total_amount, 0);
+            $("#stat-sales").textContent = money(sales);
+            $("#stat-orders").textContent = todaysOrders.length;
+            $("#stat-queue").textContent = state.orders.filter(order => ["pending", "preparing", "ready"].includes(order.status)).length;
+            $("#orders-total").textContent = state.orders.length;
+            $("#orders-pending").textContent = state.orders.filter(order => order.status === "pending").length;
+            $("#orders-preparing").textContent = state.orders.filter(order => order.status === "preparing").length;
+            $("#orders-ready").textContent = state.orders.filter(order => order.status === "ready").length;
+            $("#inventory-count").textContent = state.products.length;
+            $("#inventory-units").textContent = state.products.reduce((sum, item) => sum + item.stock, 0);
+            $("#inventory-low").textContent = state.products.filter(item => item.stock <= 5).length;
+            $("#inventory-categories").textContent = new Set(state.products.map(item => item.category)).size;
+        }
+
+        function renderOrders() {
+            const queue = $("#queue-list");
+            if (!state.orders.length) {
+                queue.innerHTML = `<div class="empty-state">No orders yet. New tickets will appear here.</div>`;
+                return;
+            }
+            queue.innerHTML = state.orders.map(order => {
+                const itemText = order.items.map(item => `${item.quantity} × ${escapeHtml(item.product?.name || `Item #${item.product_id}`)}`).join(" · ");
+                return `<article class="order-row">
+                    <div><div class="order-id">Order #${order.id} <span style="color:var(--muted);font-weight:400">· ${escapeHtml(order.customer_name || "Walk-in")}</span></div><div class="order-meta">${new Date(order.order_date).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</div></div>
+                    <div class="order-items-preview">${itemText}</div>
+                    <div class="order-total-cell">${money(order.total_amount)}</div>
+                    <select class="order-status" data-status="${order.id}" aria-label="Order ${order.id} status">${["pending", "preparing", "ready", "completed", "cancelled"].map(status => `<option value="${status}" ${order.status === status ? "selected" : ""}>${status === "ready" ? "Ready for pickup" : categoryLabel(status)}</option>`).join("")}</select>
+                </article>`;
+            }).join("");
+            queue.querySelectorAll("[data-status]").forEach(select => select.addEventListener("change", () => updateOrderStatus(Number(select.dataset.status), select.value)));
+        }
+
+        function renderInventory() {
+            $("#inventory-body").innerHTML = state.products.length ? state.products.map(product => `
+                <tr><td class="inventory-name">${escapeHtml(product.name)}<div class="order-meta">${escapeHtml(product.description || "")}</div></td><td class="inventory-category">${categoryLabel(product.category)}</td><td>${money(product.price)}</td><td><span class="stock-pill ${product.stock <= 5 ? "low" : ""}">${product.stock} units</span></td><td><div class="row-actions"><button class="button small-button" data-restock="${product.id}">＋ 5 stock</button><button class="button small-button" data-delete="${product.id}" aria-label="Delete ${escapeHtml(product.name)}">Remove</button></div></td></tr>
+            `).join("") : `<tr><td colspan="5" class="empty-state">No menu items yet. Add the first one to get started.</td></tr>`;
+            $("#inventory-body").querySelectorAll("[data-restock]").forEach(button => button.addEventListener("click", () => restock(Number(button.dataset.restock))));
+            $("#inventory-body").querySelectorAll("[data-delete]").forEach(button => button.addEventListener("click", () => removeProduct(Number(button.dataset.delete))));
+        }
+
+        async function refreshData() {
+            try {
+                const [products, orders] = await Promise.all([request("/products/"), request("/orders/")]);
+                state.products = products;
+                state.orders = orders;
+                renderCategories();
+                renderProducts();
+                renderOrders();
+                renderInventory();
+                updateMetrics();
+            } catch (error) {
+                toast(`Could not reach the café server: ${error.message}`);
+            }
+        }
+
+        async function checkout() {
+            const items = [...state.cart.entries()].map(([product_id, item]) => ({ product_id, quantity: item.quantity }));
+            if (!items.length) return;
+            const customerName = $("#customer-name").value.trim() || "Walk-in customer";
+            try {
+                const order = await request("/orders/", { method: "POST", body: JSON.stringify({ customer_name: customerName, items }) });
+                state.cart.clear();
+                $("#customer-name").value = "";
+                renderCart();
+                await refreshData();
+                toast(`Order #${order.id} sent to the bar.`);
+            } catch (error) { toast(error.message); }
+        }
+
+        async function updateOrderStatus(id, status) {
+            try {
+                await request(`/orders/${id}/status?status=${encodeURIComponent(status)}`, { method: "PUT" });
+                await refreshData();
+                toast(`Order #${id} marked ${status}.`);
+            } catch (error) { toast(error.message); }
+        }
+
+        async function restock(id) {
+            const product = state.products.find(item => item.id === id);
+            if (!product) return;
+            try {
+                await request(`/products/${id}`, { method: "PUT", body: JSON.stringify({ ...product, stock: product.stock + 5 }) });
+                await refreshData();
+                toast(`${product.name} restocked by 5.`);
+            } catch (error) { toast(error.message); }
+        }
+
+        async function removeProduct(id) {
+            const product = state.products.find(item => item.id === id);
+            if (!product || !window.confirm(`Remove ${product.name} from the menu?`)) return;
+            try {
+                await request(`/products/${id}`, { method: "DELETE" });
+                await refreshData();
+                toast(`${product.name} removed from the menu.`);
+            } catch (error) { toast(error.message); }
+        }
+
+        function setPage(page) {
+            document.querySelectorAll(".page").forEach(section => section.classList.toggle("active", section.id === `page-${page}`));
+            document.querySelectorAll(".nav-button").forEach(button => button.classList.toggle("active", button.dataset.page === page));
+            $("#crumb-label").textContent = page[0].toUpperCase() + page.slice(1);
+            if (page === "orders" || page === "inventory") refreshData();
+        }
+
+        function showModal() { $("#product-modal").classList.add("open"); $("#product-name").focus(); }
+        function hideModal() { $("#product-modal").classList.remove("open"); $("#product-form").reset(); }
+
+        document.querySelectorAll(".nav-button").forEach(button => button.addEventListener("click", () => setPage(button.dataset.page)));
+        $("#menu-search").addEventListener("input", event => { state.query = event.target.value; renderProducts(); });
+        $("#checkout-button").addEventListener("click", checkout);
+        $("#refresh-orders").addEventListener("click", refreshData);
+        $("#add-product").addEventListener("click", showModal);
+        $("#close-modal").addEventListener("click", hideModal);
+        $("#cancel-modal").addEventListener("click", hideModal);
+        $("#product-modal").addEventListener("click", event => { if (event.target === event.currentTarget) hideModal(); });
+        $("#product-form").addEventListener("submit", async event => {
+            event.preventDefault();
+            const product = {
+                name: $("#product-name").value.trim(), description: $("#product-description").value.trim() || null,
+                price: Number($("#product-price").value), stock: Number($("#product-stock").value), category: $("#product-category").value
+            };
+            try {
+                await request("/products/", { method: "POST", body: JSON.stringify(product) });
+                hideModal();
+                await refreshData();
+                toast(`${product.name} added to the menu.`);
+            } catch (error) { toast(error.message); }
+        });
+        $("#today-date").textContent = new Intl.DateTimeFormat("en-US", { weekday: "short", month: "short", day: "numeric" }).format(new Date());
+        renderCart();
+        refreshData();
+    </script>
+</body>
+</html>
