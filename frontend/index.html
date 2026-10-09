@@ -339,11 +339,11 @@
         const money = value => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(Number(value) || 0);
         const categories = ["all", "coffee", "tea", "pastry", "snack", "other"];
         const images = {
-            coffee: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=700&q=80",
-            tea: "https://images.unsplash.com/photo-1515823064-d6e0c04616a7?auto=format&fit=crop&w=700&q=80",
-            pastry: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=700&q=80",
-            snack: "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=700&q=80",
-            other: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=700&q=80"
+            coffee: "/images/coffee.jpg",
+            tea: "/images/tea.jpg",
+            pastry: "/images/pastry.jpg",
+            snack: "/images/snack.jpg",
+            other: "/images/other.jpg"
         };
         const state = { products: [], orders: [], cart: new Map(), category: "all", query: "" };
         const $ = selector => document.querySelector(selector);

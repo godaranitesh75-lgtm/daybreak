@@ -3,6 +3,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from .database import engine, Base
 from .database import SessionLocal
 from .models import models
@@ -12,6 +13,9 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Coffee Shop API", version="1.0.0")
 INDEX_FILE = Path(__file__).resolve().parents[2] / "frontend" / "index.html"
+IMAGES_DIR = Path(__file__).resolve().parents[2] / "frontend" / "public" / "images"
+
+app.mount("/images", StaticFiles(directory=IMAGES_DIR), name="images")
 
 app.add_middleware(
     CORSMiddleware,
