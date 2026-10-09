@@ -23,7 +23,7 @@ pyproject.toml       Vercel FastAPI entrypoint
 
 ## Run locally
 
-From the project folder, install dependencies and start the app:
+Start the backend in one terminal:
 
 ```powershell
 cd backend
@@ -31,7 +31,19 @@ cd backend
 ..\.venv\Scripts\python.exe -m uvicorn app.main:app --reload
 ```
 
-Open `http://127.0.0.1:8000`. The API documentation is at `http://127.0.0.1:8000/docs`.
+Start the frontend in another terminal:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Open the Vite URL printed in the frontend terminal. Its dev proxy forwards API requests to `http://127.0.0.1:8000`. The backend also serves the page at `http://127.0.0.1:8000`; API documentation is at `http://127.0.0.1:8000/docs`.
+
+## Deploy the frontend separately
+
+For a Render Static Site, use root directory `frontend`, build command `npm run build`, and publish directory `dist`. Set the `VITE_API_BASE_URL` environment variable to the deployed backend URL, with no trailing slash.
 
 ## Use Neon PostgreSQL
 

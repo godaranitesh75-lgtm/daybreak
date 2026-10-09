@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#f7f7f1">
+    <meta name="api-base-url" content="%VITE_API_BASE_URL%">
     <title>Daybreak Coffee | Shop Manager</title>
     <style>
         :root {
@@ -333,7 +334,8 @@
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
     <script>
-        const API = "";
+        const configuredApi = document.querySelector('meta[name="api-base-url"]').content.trim();
+        const API = configuredApi.startsWith("%VITE_") ? "" : configuredApi.replace(/\/$/, "");
         const money = value => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(Number(value) || 0);
         const categories = ["all", "coffee", "tea", "pastry", "snack", "other"];
         const images = {

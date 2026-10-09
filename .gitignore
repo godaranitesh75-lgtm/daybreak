@@ -4,3 +4,5 @@ backend/.env
 __pycache__/
 *.py[cod]
 backend/coffee_shop.db
+frontend/node_modules/
+frontend/dist/
